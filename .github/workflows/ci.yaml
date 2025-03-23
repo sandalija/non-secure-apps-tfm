@@ -36,7 +36,7 @@ jobs:
         run: npm install
 
       - name: Run npm audit
-        run: npm audit --json --dry-run > npm-audit.json
+        run: npm audit --json --audit-level none > npm-audit.json
 
       - name: Upload NPM audit Report
         uses: actions/upload-artifact@v4
