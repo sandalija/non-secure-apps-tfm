@@ -13,13 +13,16 @@ declare module 'express-session' {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const adminUsername = 'admin'; // Replace with environment variable if needed
+const adminPassword = '123456789'; // Replace with environment variable if needed
+const sessionSecret = 'SUPER_SECRET'; // Replace with a secure secret
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(
     session({
-        secret: 'your-secret-key', // Replace with a secure secret
+        secret: sessionSecret, // Replace with a secure secret
         resave: false,
         saveUninitialized: true,
     })
@@ -44,8 +47,6 @@ app.get('/login', (_req, res) => {
 
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
-    const adminUsername = 'admin'; // Replace with environment variable if needed
-    const adminPassword = 'password'; // Replace with environment variable if needed
 
     if (username === adminUsername && password === adminPassword) {
         req.session.isAuthenticated = true;
