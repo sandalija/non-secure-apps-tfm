@@ -7,5 +7,4 @@ repos:
           - detect
           - --source=.
           - --config=.gitleaks.toml
-          - --no-fail  # Run in informational mode
       
