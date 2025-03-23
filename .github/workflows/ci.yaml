@@ -27,9 +27,16 @@ jobs:
         run: |
           semgrep --config p/ci 
       
-      # Step 1: Checkout the code
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high
 
       # Step 2: Set up Docker
       - name: Set up Docker Buildx
@@ -49,6 +56,19 @@ jobs:
       - name: Generate SBOM
         run: |
           syft secure-container-app:latest -o spdx-json > sbom.json
+
+      - name: Install Grype
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Scan Docker Image with Grype
+        run: grype secure-container-app:latest --fail-on high
+
+      - name: Upload Grype Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: grype-report
+          path: grype-report.json
 
       # Step 6: Upload SBOM as an Artifact
       - name: Upload SBOM
