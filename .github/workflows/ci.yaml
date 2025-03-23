@@ -48,7 +48,7 @@ jobs:
       # Step 5: Generate SBOM
       - name: Generate SBOM
         run: |
-          syft secure-container-app:latest -o json > sbom.json
+          syft secure-container-app:latest -o spdx-json > sbom.json
 
       # Step 6: Upload SBOM as an Artifact
       - name: Upload SBOM
