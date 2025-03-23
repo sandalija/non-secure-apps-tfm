@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping List</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Shopping List</h1>
+            <form action="/logout" method="GET" style="display: inline;">
+                <button type="submit">Logout</button>
+            </form>
+        </header>
+        <form action="/items" method="POST">
+            <input type="text" name="name" placeholder="Add a new item" required>
+            <button type="submit">Add Item</button>
+        </form>
+        <ul>
+            <% items.forEach(item => { %>
+                <li>
+                    <%= item.name %>
+                    <form onsubmit="handleDelete(event, '<%= item.id %>')">
+                        <button type="button" onclick="handleDelete(event, '<%= item.id %>')">Delete</button>
+                    </form>
+                </li>
+            <% }); %>
+        </ul>
+    </div>
+</body>
+<script>
+    async function handleDelete(event, itemId) {
+        event.preventDefault(); // Prevent the form from submitting
+        console.log(`Deleting item with ID: ${itemId}`);
+        try {
+            const response = await fetch(`/items/${itemId}`, {
+                method: 'DELETE',
+            });
+            if (response.ok) {
+                // Remove the item from the DOM
+                event.target.closest('li').remove();
+            } else {
+                alert('Failed to delete item');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+</script>
+</html>
