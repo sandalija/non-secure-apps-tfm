@@ -83,23 +83,12 @@ jobs:
           name: sbom
           path: sbom.json
 
-      - name: Start Application
-        run: |
-          docker run -d --name secure-container-app -p 3000:3000 secure-container-app
-        env:
-          NODE_ENV: production
-
-      - name: Run OWASP ZAP Baseline Scan
+      - name: ZAP Scan
         uses: zaproxy/action-baseline@v0.14.0
         with:
-          target: "http://localhost:3000"
-          artifact_name: "zap-report"
-
-      - name: Upload OWASP ZAP Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: zap-report
-          path: zap-report.html
+          docker_name: 'secure-container-app'
+          target: 'http://localhost:3000
+          cmd_options: '-a'
 
       - name: Stop Application
         run: docker stop secure-container-app
