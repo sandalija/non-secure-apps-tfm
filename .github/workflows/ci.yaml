@@ -83,15 +83,30 @@ jobs:
           name: sbom
           path: sbom.json
         
-      - name: Stop Application
-        run: docker run -d -p 3000:3000 secure-container-app
+      
 
-      - name: ZAP Scan
-        uses: zaproxy/action-full-scan@v0.12.0
+      - name: Start Server in Background
+        run: |
+          docker run -d --name secure-container-app-p 8080:8080 secure-container-app
+          sleep 10  # Adjust this if needed
+
+      - name: Wait for Server to be Ready
+        run: |
+          until curl -s http://localhost:8080 > /dev/null; do
+            echo "Waiting for server..."
+            sleep 5
+          done
+          echo "Server is up!"
+
+      - name: Run OWASP ZAP Scan
+        run: |
+          docker run --rm -t owasp/zap2docker-stable zap-baseline.py -t http://host.docker.internal:8080 -J zap_report.json
+
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          docker_name: 'ghcr.io/zaproxy/zaproxy:stable'
-          target: 'https://www.zaproxy.org/'
+          name: zap_report
+          path: zap_report.json
 
-      - name: Stop Application
+      - name: Stop the Server
         run: docker stop secure-container-app
