@@ -128,11 +128,5 @@ jobs:
           name: report_html.html
           path: report_html.html
 
-      - name: Upload ZAP HTML Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: zap-report-html
-          path: report.html
-
       - name: Stop the Server
         run: docker stop secure-container-app
