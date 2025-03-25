@@ -87,7 +87,7 @@ jobs:
 
       - name: Start Server in Background
         run: |
-          docker run -d --name secure-container-app-p 8080:8080 secure-container-app
+          docker run -d --name secure-container-app -p 8080:8080 secure-container-app
           sleep 10  # Adjust this if needed
 
       - name: Wait for Server to be Ready
