@@ -108,7 +108,7 @@ jobs:
           target: 'http://localhost:${{ env.PORT }}'
           allow_issue_writing: false
           fail_action: false
-          cmd_options: '-r report.html -J report.json -x report.xml -w report_md.md'  # Ensure this matches the expected filename
+          cmd_options: '-w report_md.md'  # Ensure this matches the expected filename
 
       - name: Upload ZAP Markdown Report
         uses: actions/upload-artifact@v4
