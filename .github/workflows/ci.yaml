@@ -9,24 +9,23 @@ on:
       - main
 
 jobs:
-  semgrep:
+  ci:
     runs-on: ubuntu-latest
 
+    env:
+      IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/secure-container-app:latest
+      PORT: 3000
+
     steps:
-      # Step 1: Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Install Semgrep
       - name: Install Semgrep
-        run: |
-          pip install semgrep
+        run: pip install semgrep
 
-      # Step 3: Run Semgrep
       - name: Run Semgrep
-        run: |
-          semgrep --config p/ci 
-      
+        run: semgrep --config p/ci
+
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
@@ -44,31 +43,40 @@ jobs:
           name: npm-audit-report
           path: npm-audit.json
 
-      # Step 2: Set up Docker
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      # Step 3: Build Docker Image
-      - name: Build Docker Image
-        run: |
-          docker build -t secure-container-app .
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 4: Install Syft
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+
       - name: Install Syft
         run: |
           curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
 
-      # Step 5: Generate SBOM
       - name: Generate SBOM
-        run: |
-          syft secure-container-app:latest -o spdx-json > sbom.json
+        run: syft $IMAGE_NAME -o spdx-json > sbom.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.json
 
       - name: Install Grype
         run: |
           curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
 
       - name: Scan Docker Image with Grype
-        run: grype secure-container-app:latest
+        run: grype $IMAGE_NAME -o json > grype-report.json
 
       - name: Upload Grype Report
         uses: actions/upload-artifact@v4
@@ -76,23 +84,14 @@ jobs:
           name: grype-report
           path: grype-report.json
 
-      # Step 6: Upload SBOM as an Artifact
-      - name: Upload SBOM
-        uses: actions/upload-artifact@v4
-        with:
-          name: sbom
-          path: sbom.json
-        
-      
-
       - name: Start Server in Background
         run: |
-          docker run -d --name secure-container-app -p 8080:8080 secure-container-app
-          sleep 10  # Adjust this if needed
+          docker run -d --name secure-container-app -p $PORT:$PORT $IMAGE_NAME
+          sleep 10
 
       - name: Wait for Server to be Ready
         run: |
-          until curl -s http://localhost:8080 > /dev/null; do
+          until curl -s http://localhost:$PORT > /dev/null; do
             echo "Waiting for server..."
             sleep 5
           done
@@ -100,7 +99,7 @@ jobs:
 
       - name: Run OWASP ZAP Scan
         run: |
-          docker run --rm -t owasp/zap2docker-stable zap-baseline.py -t http://host.docker.internal:8080 -J zap_report.json
+          docker run --rm -t owasp/zap2docker-stable zap-baseline.py -t http://host.docker.internal:$PORT -J zap_report.json
 
       - name: Upload ZAP Report
         uses: actions/upload-artifact@v4

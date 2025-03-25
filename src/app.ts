@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import session from 'express-session';
 import ItemController from './controllers/itemController'; // Rename TodoController to ItemController
+import bodyParser from 'body-parser';
 
 declare module 'express-session' {
     interface SessionData {
@@ -17,8 +18,8 @@ const adminUsername = 'admin'; // Replace with environment variable if needed
 const adminPassword = '123456789'; // Replace with environment variable if needed
 const sessionSecret = 'SUPER_SECRET'; // Replace with a secure secret
 // Middleware
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(
     session({
