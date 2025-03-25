@@ -16,6 +16,9 @@ jobs:
       IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/secure-container-app:latest
       PORT: 3000
 
+    permissions:
+      packages: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
