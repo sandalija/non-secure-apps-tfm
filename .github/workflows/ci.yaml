@@ -108,13 +108,25 @@ jobs:
           target: 'http://localhost:${{ env.PORT }}'
           allow_issue_writing: false
           fail_action: false
-          cmd_options: '-w report_md.md'  # Ensure this matches the expected filename
+          cmd_options: '-w report_md.md -J report.json -r report.html'
 
       - name: Upload ZAP Markdown Report
         uses: actions/upload-artifact@v4
         with:
-          name: zap-report.md
-          path: report_md.md  # Ensure this matches the generated filename
+          name: zap-report-md
+          path: report_md.md
+
+      - name: Upload ZAP JSON Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report-json
+          path: report.json
+
+      - name: Upload ZAP HTML Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report-html
+          path: report.html
 
       - name: Stop the Server
         run: docker stop secure-container-app
