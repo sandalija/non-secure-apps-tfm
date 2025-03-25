@@ -108,25 +108,25 @@ jobs:
           target: 'http://localhost:${{ env.PORT }}'
           allow_issue_writing: false
           fail_action: false
-          cmd_options: '-w report_md.md -J report.json -r report.html'
+          # cmd_options: "" # `-J report_json.json -w report_md.md -r report_html.html` set by default
     
       - name: Upload ZAP Markdown Report
         uses: actions/upload-artifact@v4
         with:
-          name: zap-report-md
+          name: report_md.md
           path: report_md.md
 
       - name: Upload ZAP JSON Report
         uses: actions/upload-artifact@v4
         with:
-          name: report.json
-          path: report.json
+          name: report_json.json
+          path: report_json.json
 
       - name: Upload ZAP JSON Report
         uses: actions/upload-artifact@v4
         with:
-          name: report.html
-          path: report.html
+          name: report_html.html
+          path: report_html.html
 
       - name: Upload ZAP HTML Report
         uses: actions/upload-artifact@v4
