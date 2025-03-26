@@ -43,7 +43,7 @@ jobs:
           echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Set IMAGE_NAME
-        run: echo "IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/secure-container-app:${{ env.VERSION }}-${{ env.GITHUB_RUN_NUMBER }}" >> $GITHUB_ENV
+        run: echo "IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/secure-container-app:${{ env.VERSION }}" >> $GITHUB_ENV
 
       - name: Install Semgrep
         run: pip install semgrep
