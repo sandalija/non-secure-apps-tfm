@@ -139,6 +139,9 @@ jobs:
       - name: Stop the Server
         run: docker stop secure-container-app
 
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.1.1
+
       - name: Sign the images with GitHub OIDC Token
         env:
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
